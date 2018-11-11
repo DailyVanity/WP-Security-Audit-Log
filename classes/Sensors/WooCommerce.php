@@ -131,6 +131,132 @@ class WSAL_Sensors_WooCommerce extends WSAL_AbstractSensor {
 
 		add_action( 'wp_head', array( $this, 'viewing_product' ), 10 );
 		add_filter( 'post_edit_form_tag', array( $this, 'editing_product' ), 10, 1 );
+		
+		// add_action( 'woocommerce_order_status_pending',  array( $this, 'order_status_pending') );
+		// add_action( 'woocommerce_order_status_failed',  array( $this, 'order_status_failed') );
+		// add_action( 'woocommerce_order_status_on-hold',  array( $this, 'order_status_hold') );
+		// add_action( 'woocommerce_order_status_processing',  array( $this, 'order_status_processing') );
+		// add_action( 'woocommerce_order_status_completed',  array( $this, 'order_status_completed') );
+		// add_action( 'woocommerce_order_status_refunded',  array( $this, 'order_status_refunded') );
+		// add_action( 'woocommerce_order_status_cancelled',  array( $this, 'order_status_cancelled') );
+		
+		add_filter( 'init', array( $this, 'update_woo_order_log' ), 1000, 1 );
+		
+	}
+	
+	public function update_woo_order_log() {
+		if( isset( $_GET['update_woo_order_log'] ) ) {
+			$this->plugin->alerts->Trigger(
+				9050, array(
+					'OrderID'       	=> $_GET['order_id'],
+					'OrderNewStatus'    => $_GET['order_status'],
+					'VoucherCode'		=> $_GET['voucher_codes']
+				)
+			);
+		}
+	}
+	
+	/**
+	 * Triggered when stock of a product is changed.
+	 *
+	 * @param WC_Product $product - WooCommerce product object.
+	 */
+	public function order_status_pending( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Pending',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	
+	public function order_status_failed( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Pailed',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	
+	public function order_status_hold( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Hold',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	
+	public function order_status_completed( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Completed',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	
+	public function order_status_processing( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Processing',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	
+	public function order_status_refunded( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Refunded',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
+	}
+	 
+	public function order_status_cancelled( $order_id ) {
+		$order = wc_get_order( $order_id );
+		$user_id     = absint( $order->customer_user );
+		$user        = get_user_by( 'id', $user_id ); 
+		
+		$this->plugin->alerts->Trigger(
+			9050, array(
+				'OrderID'       => $order_id,
+				'OrderNewStatus'       => 'Cancelled',
+				'VoucherCode'		=> admin_get_vouchers_code( $order_id, $user->user_email )
+			)
+		);
 	}
 
 	/**
